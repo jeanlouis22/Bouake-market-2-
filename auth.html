@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connexion – Market Bouaké</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>🛒 Market Bouaké</h1>
+    <p class="sub">Connectez-vous ou créez votre compte</p>
+
+    <div id="msg" class="msg" hidden></div>
+
+    <div class="tabs" id="tabs">
+      <button id="tab-login" class="on" type="button">Connexion</button>
+      <button id="tab-register" type="button">Inscription</button>
+    </div>
+
+    <form id="form-login">
+      <label for="login-email">Email</label>
+      <input id="login-email" type="email" required autocomplete="email">
+      <label for="login-password">Mot de passe</label>
+      <input id="login-password" type="password" required autocomplete="current-password">
+      <button class="btn" type="submit">Se connecter</button>
+      <button class="link" id="to-forgot" type="button">Mot de passe oublié ?</button>
+    </form>
+
+    <form id="form-register" hidden>
+      <label for="reg-name">Nom complet</label>
+      <input id="reg-name" type="text" required autocomplete="name">
+      <label for="reg-email">Email</label>
+      <input id="reg-email" type="email" required autocomplete="email">
+      <label for="reg-password">Mot de passe (6 caractères minimum)</label>
+      <input id="reg-password" type="password" required minlength="6" autocomplete="new-password">
+      <button class="btn" type="submit">Créer mon compte</button>
+    </form>
+
+    <form id="form-forgot" hidden>
+      <label for="forgot-email">Votre email</label>
+      <input id="forgot-email" type="email" required>
+      <button class="btn" type="submit">Envoyer le lien</button>
+      <button class="link" id="back-login" type="button">← Retour à la connexion</button>
+    </form>
+
+    <form id="form-newpass" hidden>
+      <label for="new-password">Nouveau mot de passe</label>
+      <input id="new-password" type="password" required minlength="6" autocomplete="new-password">
+      <button class="btn" type="submit">Enregistrer</button>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/auth.js"></script>
+</body>
+</html>
