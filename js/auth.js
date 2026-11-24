@@ -52,7 +52,10 @@ $("form-register").addEventListener("submit", (ev) => {
       email: $("reg-email").value.trim(),
       password: $("reg-password").value,
       options: {
-        data: { full_name: $("reg-name").value.trim() },
+        data: {
+          full_name: $("reg-name").value.trim(),
+          requested_activities: [...document.querySelectorAll(".act-check:checked")].map((c) => c.value),
+        },
         emailRedirectTo: new URL("account.html", location.href).href,
       },
     });
