@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mon compte – Market Bouaké</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>Mon compte</h1>
+    <p class="sub" id="who">Chargement…</p>
+    <h3>Mes activités</h3>
+    <div id="acts"></div>
+    <button class="btn sec" id="logout" type="button">Se déconnecter</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script>
+const LABELS = {buyer:"Acheteur",seller:"Vendeur",company:"Entreprise",candidate:"Candidat",
+  professional:"Professionnel",property_owner:"Immobilier",hotelier:"Hébergement",advertiser:"Annonceur"};
+const STATUS = {approved:"Validée",pending:"En attente",rejected:"Refusée",suspended:"Suspendue"};
+
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return (location.href = "auth.html");
+
+  const { data: profile, error: e1 } = await sb.from("profiles")
+    .select("full_name").eq("id", session.user.id).single();
+  if (e1) console.error(e1);
+  document.getElementById("who").textContent =
+    (profile && profile.full_name ? profile.full_name + " · " : "") + session.user.email;
+
+  const { data: acts, error: e2 } = await sb.from("user_activities")
+    .select("activity_type,status").eq("user_id", session.user.id);
+  if (e2) console.error(e2);
+  const box = document.getElementById("acts");
+  (acts || []).forEach((a) => {
+    const row = document.createElement("div"); row.className = "row";
+    const l = document.createElement("span"); l.textContent = LABELS[a.activity_type] || a.activity_type;
+    const b = document.createElement("span"); b.className = "badge " + a.status; b.textContent = STATUS[a.status] || a.status;
+    row.append(l, b); box.append(row);
+  });
+
+  document.getElementById("logout").onclick = async () => {
+    await sb.auth.signOut(); location.href = "auth.html";
+  };
+})();
+</script>
+</body>
+</html>
