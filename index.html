@@ -8,51 +8,9 @@
   <link rel="icon" type="image/svg+xml" href="assets/logo/favicon.svg">
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body data-page="accueil">
 
-<div class="topbar">
-  <div class="container">
-    <a href="#" data-soon="À propos">À propos</a>
-    <a href="#" data-soon="Contact">Contact</a>
-  </div>
-</div>
-
-<header class="site-header">
-  <div class="container hbar">
-    <button class="icon-btn burger" id="burger" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="nav">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-    </button>
-
-    <a class="logo" href="index.html" aria-label="Market Bouaké, accueil">
-      <img class="full" src="assets/logo/logo-compact.svg" alt="Market Bouaké">
-      <img class="icon" src="assets/logo/favicon.svg" alt="Market Bouaké">
-    </a>
-
-    <nav class="main-nav" id="nav" aria-label="Navigation principale">
-      <a href="index.html" aria-current="page">Accueil</a>
-      <a href="#" data-soon="Marketplace">Marketplace</a>
-      <a href="#" data-soon="Publicités">Publicités</a>
-      <a href="#" data-soon="Offres d'emploi">Offres d'emploi</a>
-      <a href="#" data-soon="Résidences">Résidences</a>
-      <a href="#" data-soon="Hôtels">Hôtels</a>
-      <a class="only-mobile" href="#" data-soon="À propos">À propos</a>
-      <a class="only-mobile" href="#" data-soon="Contact">Contact</a>
-    </nav>
-
-    <div class="hactions">
-      <button class="icon-btn" type="button" data-soon="La recherche" aria-label="Rechercher">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-      </button>
-      <button class="icon-btn" type="button" data-soon="Le panier" aria-label="Panier">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.5 12.5h11L21 7H6"/></svg>
-      </button>
-      <div class="hauth" id="hauth">
-        <a class="hbtn line" href="auth.html">Connexion</a>
-        <a class="hbtn fill" href="auth.html">Inscription</a>
-      </div>
-    </div>
-  </div>
-</header>
+<div id="site-header"></div>
 
 <main>
   <section class="hero">
@@ -66,70 +24,93 @@
     </div>
   </section>
 
-  <section class="section">
-    <div class="container">
-      <h2>Découvrir Market Bouaké</h2>
-      <div class="grid">
-        <a class="tile" href="#" data-soon="Marketplace"><strong>Marketplace</strong><span>Produits, boutiques et promotions.</span></a>
-        <a class="tile" href="#" data-soon="Publicités"><strong>Publicités</strong><span>Promotions, événements et annonces.</span></a>
-        <a class="tile" href="#" data-soon="Offres d'emploi"><strong>Offres d'emploi</strong><span>Emplois, stages et formations.</span></a>
-        <a class="tile" href="#" data-soon="Résidences"><strong>Résidences</strong><span>Maisons, appartements et studios.</span></a>
-        <a class="tile" href="#" data-soon="Hôtels"><strong>Hôtels</strong><span>Hôtels, auberges et hébergements.</span></a>
-      </div>
-    </div>
-  </section>
+  <div class="container" id="sections">
+    <section class="section" id="cat-section">
+      <div class="sec-head"><h2>Catégories</h2><a href="#" data-soon="Marketplace">Voir plus</a></div>
+      <div class="cat-chips" id="cats"></div>
+    </section>
+  </div>
+  <div class="pagebottom"></div>
 </main>
 
-<footer class="site-footer">
-  <div class="container">© Market Bouaké</div>
-</footer>
-
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div id="site-footer"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js"></script>
+<script src="js/layout.js"></script>
 <script>
 (function () {
-  var burger = document.getElementById("burger");
-  var nav = document.getElementById("nav");
-  burger.addEventListener("click", function () {
-    var open = nav.classList.toggle("open");
-    burger.setAttribute("aria-expanded", open ? "true" : "false");
-    burger.setAttribute("aria-label", open ? "Fermer le menu" : "Ouvrir le menu");
-  });
+  var SECTIONS = [
+    ["Produits populaires", "Marketplace", "Aucun produit pour le moment", "Les produits des vendeurs apparaîtront ici."],
+    ["Produits récemment publiés", "Marketplace", "Aucun produit pour le moment", "Les nouveautés apparaîtront ici."],
+    ["Boutiques à découvrir", "Boutiques", "Aucune boutique pour le moment", "Les boutiques des vendeurs apparaîtront ici."],
+    ["Publicités et promotions", "Publicités", "Aucune publicité en cours", "Les promotions et annonces apparaîtront ici."],
+    ["Événements à venir", "Événements", "Aucun événement à venir", "Concerts, conférences et cérémonies apparaîtront ici."],
+    ["Offres d'emploi récentes", "Offres d'emploi", "Aucune offre d'emploi pour le moment", "Les offres publiées par l'administration apparaîtront ici."],
+    ["Offres de stage récentes", "Offres de stage", "Aucune offre de stage pour le moment", "Les stages apparaîtront ici."],
+    ["Résidences disponibles", "Résidences", "Aucune résidence pour le moment", "Maisons à louer, appartements et studios apparaîtront ici."],
+    ["Hôtels à découvrir", "Hôtels", "Aucun hôtel pour le moment", "Hôtels et auberges apparaîtront ici."]
+  ];
 
-  var toast = document.getElementById("toast");
-  var timer;
-  document.querySelectorAll("[data-soon]").forEach(function (el) {
-    el.addEventListener("click", function (ev) {
-      ev.preventDefault();
-      toast.textContent = el.getAttribute("data-soon") + " : bientôt disponible.";
-      toast.classList.add("show");
-      clearTimeout(timer);
-      timer = setTimeout(function () { toast.classList.remove("show"); }, 2500);
-    });
+  var box = document.getElementById("sections");
+  SECTIONS.forEach(function (s) {
+    var sec = document.createElement("section");
+    sec.className = "section";
+    var head = document.createElement("div");
+    head.className = "sec-head";
+    var h2 = document.createElement("h2");
+    h2.textContent = s[0];
+    var more = document.createElement("a");
+    more.href = "#";
+    more.setAttribute("data-soon", s[1]);
+    more.textContent = "Voir plus";
+    head.append(h2, more);
+    var empty = document.createElement("div");
+    empty.className = "empty";
+    var st = document.createElement("strong");
+    st.textContent = s[2];
+    var sp = document.createElement("span");
+    sp.textContent = s[3];
+    empty.append(st, sp);
+    sec.append(head, empty);
+    box.appendChild(sec);
   });
 
   (async function () {
+    var cats = document.getElementById("cats");
     try {
-      var res = await sb.auth.getSession();
-      if (!res.data.session) return;
-      var hauth = document.getElementById("hauth");
-      hauth.textContent = "";
-      var a = document.createElement("a");
-      a.className = "hbtn fill";
-      a.href = "account.html";
-      a.textContent = "Mon compte";
-      hauth.appendChild(a);
-      var cta = document.getElementById("cta");
-      cta.textContent = "";
-      var b = document.createElement("a");
-      b.className = "btn";
-      b.href = "account.html";
-      b.textContent = "Accéder à mon compte";
-      cta.appendChild(b);
-    } catch (e) { console.error(e); }
+      var res = await sb.from("categories").select("id,name,sort_order")
+        .eq("is_active", true).order("sort_order");
+      if (res.error) throw res.error;
+      if (!res.data || !res.data.length) {
+        cats.className = "empty";
+        cats.innerHTML = "<strong>Aucune catégorie pour le moment</strong>";
+        return;
+      }
+      res.data.forEach(function (c) {
+        var a = document.createElement("a");
+        a.href = "#";
+        a.setAttribute("data-soon", c.name);
+        a.textContent = c.name;
+        cats.appendChild(a);
+      });
+    } catch (e) {
+      console.error(e);
+      cats.className = "empty";
+      cats.innerHTML = "<strong>Les catégories ne peuvent pas être chargées</strong><span>Réessayez dans un instant.</span>";
+    }
   })();
+
+  window.MB_SESSION.then(function (session) {
+    if (!session) return;
+    var cta = document.getElementById("cta");
+    cta.textContent = "";
+    var b = document.createElement("a");
+    b.className = "btn";
+    b.href = "account.html";
+    b.textContent = "Accéder à mon compte";
+    cta.appendChild(b);
+  });
 })();
 </script>
 </body>
