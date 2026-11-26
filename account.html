@@ -4,9 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Mon compte – Market Bouaké</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo/favicon.svg">
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body data-page="compte">
+
+<div id="site-header"></div>
+
 <div class="wrap">
   <div class="card">
     <h1>Mon compte</h1>
@@ -17,8 +21,11 @@
   </div>
 </div>
 
+<div id="site-footer"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js"></script>
+<script src="js/layout.js"></script>
 <script>
 const LABELS = {buyer:"Acheteur",seller:"Vendeur",company:"Entreprise",candidate:"Candidat",
   professional:"Professionnel",property_owner:"Immobilier",hotelier:"Hébergement",advertiser:"Annonceur"};
@@ -52,3 +59,4 @@ const STATUS = {approved:"Validée",pending:"En attente",rejected:"Refusée",sus
 </script>
 </body>
 </html>
+
