@@ -4,12 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Connexion – Market Bouaké</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo/favicon.svg">
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body data-page="connexion">
+
+<div id="site-header"></div>
+
 <div class="wrap">
   <div class="card">
-    <h1>🛒 Market Bouaké</h1>
+    <h1>Bienvenue</h1>
     <p class="sub">Connectez-vous ou créez votre compte</p>
 
     <div id="msg" class="msg" hidden></div>
@@ -64,8 +68,11 @@
   </div>
 </div>
 
+<div id="site-footer"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js"></script>
+<script src="js/layout.js"></script>
 <script src="js/auth.js"></script>
 </body>
 </html>
