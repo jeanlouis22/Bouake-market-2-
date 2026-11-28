@@ -1,4 +1,4 @@
-/* En-tête et pied de page partagés par toutes les pages de Market Bouaké. */
+/* En-tête, barre du bas et pied de page partagés par toutes les pages de Market Bouaké. */
 (function () {
   var NAV = [
     ["Accueil", "index.html", "accueil"],
@@ -43,6 +43,9 @@
   var ICON_MENU = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
   var ICON_SEARCH = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>';
   var ICON_CART = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.5 12.5h11L21 7H6"/></svg>';
+  var ICON_HOME = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/><path d="M10 20v-6h4v6"/></svg>';
+  var ICON_ADS = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3l7 4V6L7 10z"/><path d="M17 9a4 4 0 0 1 0 6"/></svg>';
+  var ICON_JOBS = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/></svg>';
   var ICON_USER = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>';
 
   var headerHTML =
@@ -56,15 +59,13 @@
         "</nav>" +
         '<div class="hactions">' +
           '<button class="icon-btn" type="button" data-soon="Le panier" aria-label="Panier">' + ICON_CART + "</button>" +
-          '<a class="icon-btn only-narrow" id="usericon" href="auth.html" aria-label="Connexion">' + ICON_USER + "</a>" +
           '<div class="hauth" id="hauth"><a class="hbtn line" href="auth.html">Connexion</a><a class="hbtn fill" href="auth.html">Inscription</a></div>' +
         "</div>" +
       "</div>" +
       '<div class="container searchrow"><form id="searchform" role="search">' +
-        '<input type="search" id="q" placeholder="Rechercher produits, boutiques, hôtels, offres…" aria-label="Rechercher">' +
+        '<input type="search" id="q" placeholder="Rechercher un produit…" aria-label="Rechercher">' +
         '<button class="icon-btn" type="submit" aria-label="Lancer la recherche">' + ICON_SEARCH + "</button>" +
       "</form></div>" +
-      '<div class="container chips">' + nav + "</div>" +
     "</header>";
 
   var cols = COLS.map(function (c) {
@@ -91,10 +92,24 @@
       '<div class="f-bottom">© ' + new Date().getFullYear() + " Market Bouaké — Tous droits réservés.</div>" +
     "</div></footer>";
 
+  var accountCur = (page === "connexion" || page === "compte") ? ' aria-current="page"' : "";
+  var homeCur = page === "accueil" ? ' aria-current="page"' : "";
+  var bottomHTML =
+    '<nav class="bottomnav" aria-label="Navigation du bas">' +
+      '<a href="index.html"' + homeCur + ">" + ICON_HOME + "Accueil</a>" +
+      '<a href="#" data-soon="Publicités">' + ICON_ADS + "Publicités</a>" +
+      '<a href="#" data-soon="Offres d\'emploi">' + ICON_JOBS + "Emplois</a>" +
+      '<button type="button" id="acctbtn" aria-haspopup="dialog"' + accountCur + ">" + ICON_USER + "Compte</button>" +
+    "</nav>" +
+    '<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-label="Compte">' +
+      '<div class="sheet-bg" id="sheetbg"></div><div class="sheet-card" id="sheetcard"></div>' +
+    "</div>";
+
   var h = document.getElementById("site-header");
   var f = document.getElementById("site-footer");
   if (h) h.innerHTML = headerHTML;
   if (f) f.innerHTML = footerHTML;
+  document.body.insertAdjacentHTML("beforeend", bottomHTML);
 
   var toast = document.createElement("div");
   toast.className = "toast";
@@ -109,12 +124,60 @@
     timer = setTimeout(function () { toast.classList.remove("show"); }, 2500);
   }
 
+  var sheet = document.getElementById("sheet");
+  var sheetCard = document.getElementById("sheetcard");
+  function closeSheet() { sheet.hidden = true; }
+  function openSheet() { sheet.hidden = false; }
+
   document.addEventListener("click", function (ev) {
     var el = ev.target.closest("[data-soon]");
     if (!el) return;
     ev.preventDefault();
     say(el.getAttribute("data-soon") + " : bientôt disponible.");
   });
+
+  document.getElementById("acctbtn").addEventListener("click", openSheet);
+  document.getElementById("sheetbg").addEventListener("click", closeSheet);
+  sheetCard.addEventListener("click", function (ev) {
+    if (ev.target.closest("a")) closeSheet();
+  });
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key === "Escape") closeSheet();
+  });
+
+  function sheetLink(label, href, soon) {
+    var a = document.createElement("a");
+    a.href = href;
+    a.textContent = label;
+    if (soon) a.setAttribute("data-soon", label);
+    return a;
+  }
+
+  function renderSheet(session) {
+    sheetCard.textContent = "";
+    var t = document.createElement("div");
+    t.className = "sheet-title";
+    t.textContent = session ? "Mon espace" : "Bienvenue";
+    sheetCard.appendChild(t);
+    if (session) {
+      sheetCard.appendChild(sheetLink("Mon compte", "account.html"));
+      var out = document.createElement("button");
+      out.type = "button";
+      out.className = "sbtn danger";
+      out.textContent = "Se déconnecter";
+      out.addEventListener("click", async function () {
+        await sb.auth.signOut();
+        location.href = "index.html";
+      });
+      sheetCard.appendChild(out);
+    } else {
+      sheetCard.appendChild(sheetLink("Connexion", "auth.html"));
+      sheetCard.appendChild(sheetLink("Inscription", "auth.html"));
+    }
+    sheetCard.appendChild(sheetLink("À propos", "#", true));
+    sheetCard.appendChild(sheetLink("Contact", "#", true));
+  }
+  renderSheet(null);
 
   var burger = document.getElementById("burger");
   var navEl = document.getElementById("nav");
@@ -152,6 +215,7 @@
 
   window.MB_SESSION.then(function (session) {
     if (!session) return;
+    renderSheet(session);
     var hauth = document.getElementById("hauth");
     if (hauth) {
       hauth.textContent = "";
@@ -161,8 +225,6 @@
       a.textContent = "Mon compte";
       hauth.appendChild(a);
     }
-    var ui = document.getElementById("usericon");
-    if (ui) { ui.href = "account.html"; ui.setAttribute("aria-label", "Mon compte"); }
     var na = document.getElementById("navauth");
     if (na) {
       na.textContent = "";
