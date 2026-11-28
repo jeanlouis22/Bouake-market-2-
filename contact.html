@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#C1272D">
+  <title>Contact – Market Bouaké</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo/favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/pages.css">
+</head>
+<body data-page="contact">
+
+<div id="site-header"></div>
+
+<main class="page">
+  <h1>Contact</h1>
+  <p class="lead">Une question ? Une offre d'emploi ou de stage à publier ? Une publicité à proposer ? Contactez l'administration de MARKET BOUAKÉ.</p>
+
+  <div class="contact-list" id="contacts"></div>
+  <div class="empty" id="nocontact" hidden style="margin-top:14px">
+    <strong>Les coordonnées seront bientôt disponibles</strong>
+    <span>L'administration les publiera prochainement.</span>
+  </div>
+
+  <h2>Informations à transmettre</h2>
+  <p><strong>Pour une offre d'emploi ou de stage :</strong> le titre, le type d'offre, le nom de l'entreprise ou du recruteur, la description, les missions, le profil recherché, les conditions, la localisation, la date limite, votre adresse e-mail, votre numéro WhatsApp et les modalités de candidature.</p>
+  <p><strong>Pour une publicité ou un événement :</strong> le titre, l'image ou l'affiche, la description, la catégorie, les dates de début et de fin, le lieu, un contact et, si besoin, un lien externe.</p>
+  <p>L'administration vérifie ces informations, puis accepte ou refuse la publication.</p>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/layout.js"></script>
+<script>
+window.MB_SETTINGS.then(function (S) {
+  var U = window.MB_UTIL;
+  var items = [
+    ["WhatsApp", U.wa(S.contact_whatsapp), "Écrire sur WhatsApp", S.contact_whatsapp, true],
+    ["E-mail", U.mail(S.contact_email), "Envoyer un e-mail", S.contact_email, false],
+    ["Téléphone", U.tel(S.contact_phone), "Appeler", S.contact_phone, false]
+  ].filter(function (i) { return i[1]; });
+
+  if (!items.length) {
+    document.getElementById("nocontact").hidden = false;
+    return;
+  }
+  var list = document.getElementById("contacts");
+  items.forEach(function (i) {
+    var card = document.createElement("div");
+    card.className = "contact-card";
+    var t = document.createElement("strong");
+    t.textContent = i[0];
+    var v = document.createElement("span");
+    v.className = "val";
+    v.textContent = i[3];
+    var a = document.createElement("a");
+    a.className = "btn";
+    a.href = i[1];
+    a.textContent = i[2];
+    if (i[4]) { a.target = "_blank"; a.rel = "noopener noreferrer"; }
+    card.append(t, v, a);
+    list.appendChild(card);
+  });
+});
+</script>
+</body>
+</html>
