@@ -13,6 +13,11 @@
 <div id="site-header"></div>
 
 <main>
+  <div class="container only-narrow" id="visitor" style="display:flex;gap:10px;padding-top:12px;padding-bottom:12px;background:#fff">
+    <a class="btn" href="auth.html" style="margin:0;flex:1;padding:10px">Inscription</a>
+    <a class="btn sec" href="auth.html" style="margin:0;flex:1;padding:10px">Connexion</a>
+  </div>
+
   <section class="carousel-wrap" aria-label="Promotions et annonces" aria-roledescription="carousel">
     <div class="container">
       <div class="carousel" id="carousel">
@@ -250,6 +255,9 @@
     start();
   }
 
+  window.MB_SESSION.then(function (session) {
+    if (session) document.getElementById("visitor").hidden = true;
+  });
   window.MB_SESSION.then(loadBanners);
 })();
 </script>
