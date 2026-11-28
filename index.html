@@ -13,21 +13,25 @@
 <div id="site-header"></div>
 
 <main>
-  <section class="hero">
+  <section class="carousel-wrap" aria-label="Promotions et annonces" aria-roledescription="carousel">
     <div class="container">
-      <h1>La plateforme locale de Bouaké</h1>
-      <p>Achetez, vendez, trouvez un logement ou une offre d'emploi, près de chez vous.</p>
-      <div class="cta" id="cta">
-        <a class="btn" href="auth.html">Créer un compte</a>
-        <a class="btn sec" href="auth.html">Se connecter</a>
+      <div class="carousel" id="carousel">
+        <div class="track" id="track"></div>
+        <button class="arrow prev" id="prev" type="button" aria-label="Bannière précédente" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <button class="arrow next" id="next" type="button" aria-label="Bannière suivante" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
       </div>
+      <div class="dots" id="dots"></div>
     </div>
   </section>
 
   <div class="container" id="sections">
     <section class="section" id="cat-section">
       <div class="sec-head"><h2>Catégories</h2><a href="#" data-soon="Marketplace">Voir plus</a></div>
-      <div class="cat-chips" id="cats"></div>
+      <div class="cats" id="cats"></div>
     </section>
   </div>
   <div class="pagebottom"></div>
@@ -40,14 +44,12 @@
 <script src="js/layout.js"></script>
 <script>
 (function () {
+  /* ---------- Sections de l'accueil (vides tant qu'il n'y a pas de données) ---------- */
   var SECTIONS = [
     ["Produits populaires", "Marketplace", "Aucun produit pour le moment", "Les produits des vendeurs apparaîtront ici."],
     ["Produits récemment publiés", "Marketplace", "Aucun produit pour le moment", "Les nouveautés apparaîtront ici."],
     ["Boutiques à découvrir", "Boutiques", "Aucune boutique pour le moment", "Les boutiques des vendeurs apparaîtront ici."],
     ["Publicités et promotions", "Publicités", "Aucune publicité en cours", "Les promotions et annonces apparaîtront ici."],
-    ["Événements à venir", "Événements", "Aucun événement à venir", "Concerts, conférences et cérémonies apparaîtront ici."],
-    ["Offres d'emploi récentes", "Offres d'emploi", "Aucune offre d'emploi pour le moment", "Les offres publiées par l'administration apparaîtront ici."],
-    ["Offres de stage récentes", "Offres de stage", "Aucune offre de stage pour le moment", "Les stages apparaîtront ici."],
     ["Résidences disponibles", "Résidences", "Aucune résidence pour le moment", "Maisons à louer, appartements et studios apparaîtront ici."],
     ["Hôtels à découvrir", "Hôtels", "Aucun hôtel pour le moment", "Hôtels et auberges apparaîtront ici."]
   ];
@@ -76,22 +78,44 @@
     box.appendChild(sec);
   });
 
+  /* ---------- Catégories avec icônes (associées au slug) ---------- */
+  var HIDDEN = { "immobilier": 1, "hebergement": 1, "emploi-stages": 1, "evenements": 1 };
+  var ICONS = {
+    "mode-beaute": '<path d="M12 7.5a2.5 2.5 0 1 0-2.5-2.5"/><path d="M12 7.5V10"/><path d="M12 10 3.4 16.2A1.3 1.3 0 0 0 4.2 18.5h15.6a1.3 1.3 0 0 0 .8-2.3z"/>',
+    "restaurants": '<path d="M19 3v12h-5c-.023-3.681.184-7.406 5-12z"/><path d="M19 15v6h-1v-3"/><path d="M8 13v9"/><path d="M5 3v3a3 3 0 1 0 6 0V3"/>',
+    "electronique": '<path d="M6 5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z"/><path d="M11 4h2"/><path d="M12 17v.01"/>',
+    "services": '<path d="M7 10h3V7L6.5 3.5a6 6 0 0 1 8 8l6 6a2 2 0 0 1-3 3l-6-6a6 6 0 0 1-8-8z"/>',
+    "maison": '<path d="M5 11a2 2 0 0 1 2 2v2h10v-2a2 2 0 1 1 4 0v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2z"/><path d="M5 11V6a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v5"/><path d="M6 19v2"/><path d="M18 19v2"/>',
+    "alimentation": '<path d="M12 8c-2-2-6-2-7 1.5s1 8.5 4 10.5c1.2.8 2.2.5 3 0 .8.5 1.8.8 3 0 3-2 5-7 4-10.5S14 6 12 8z"/><path d="M12 8c0-2 1-3.5 3-4.5"/>',
+    "informatique": '<path d="M3 19h18"/><path d="M5 7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"/>',
+    "transport": '<circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17H3v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0H9m-6-6h15m-6 0V6"/>'
+  };
+  var GENERIC = '<path d="M4 4h6v6H4z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6H4z"/><path d="M14 14h6v6h-6z"/>';
+
   (async function () {
     var cats = document.getElementById("cats");
     try {
-      var res = await sb.from("categories").select("id,name,sort_order")
+      var res = await sb.from("categories").select("id,slug,name,sort_order")
         .eq("is_active", true).order("sort_order");
       if (res.error) throw res.error;
-      if (!res.data || !res.data.length) {
+      var list = (res.data || []).filter(function (c) { return !HIDDEN[c.slug]; });
+      if (!list.length) {
         cats.className = "empty";
         cats.innerHTML = "<strong>Aucune catégorie pour le moment</strong>";
         return;
       }
-      res.data.forEach(function (c) {
+      list.forEach(function (c) {
         var a = document.createElement("a");
+        a.className = "cat";
         a.href = "#";
         a.setAttribute("data-soon", c.name);
-        a.textContent = c.name;
+        var ico = document.createElement("span");
+        ico.className = "ico";
+        ico.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + (ICONS[c.slug] || GENERIC) + "</svg>";
+        var nom = document.createElement("span");
+        nom.className = "nom";
+        nom.textContent = c.name;
+        a.append(ico, nom);
         cats.appendChild(a);
       });
     } catch (e) {
@@ -101,16 +125,132 @@
     }
   })();
 
-  window.MB_SESSION.then(function (session) {
-    if (!session) return;
-    var cta = document.getElementById("cta");
-    cta.textContent = "";
-    var b = document.createElement("a");
-    b.className = "btn";
-    b.href = "account.html";
-    b.textContent = "Accéder à mon compte";
-    cta.appendChild(b);
-  });
+  /* ---------- Bannière défilante : contenu publié par l'administration ---------- */
+  var KINDS = { promotion: "Promotion", evenement: "Événement", offre: "Offre", annonce: "Annonce" };
+  var SAFE_URL = /^(https:\/\/|[a-z0-9-]+\.html)/;
+
+  async function loadBanners(session) {
+    var track = document.getElementById("track");
+    var dotsBox = document.getElementById("dots");
+    var prev = document.getElementById("prev");
+    var next = document.getElementById("next");
+    var carousel = document.getElementById("carousel");
+    var slides = [];
+
+    try {
+      var res = await sb.from("banners")
+        .select("kind,title,description,button_label,button_url,image_url,sort_order,starts_at,ends_at,is_active,created_at")
+        .eq("is_active", true)
+        .order("sort_order")
+        .order("created_at", { ascending: false });
+      if (res.error) throw res.error;
+      var now = Date.now();
+      slides = (res.data || []).filter(function (b) {
+        return (!b.starts_at || new Date(b.starts_at).getTime() <= now) &&
+               (!b.ends_at || new Date(b.ends_at).getTime() >= now);
+      });
+    } catch (e) {
+      console.error(e);
+    }
+
+    if (!slides.length) {
+      slides = [{
+        kind: null,
+        title: "Bienvenue sur Market Bouaké",
+        description: "Achetez, vendez, trouvez un logement ou une offre d'emploi près de chez vous.",
+        button_label: session ? "Mon compte" : "Créer un compte",
+        button_url: session ? "account.html" : "auth.html"
+      }];
+    }
+
+    var n = slides.length;
+    slides.forEach(function (b, i) {
+      var s = document.createElement("div");
+      s.className = "slide";
+      s.setAttribute("role", "group");
+      s.setAttribute("aria-roledescription", "diapositive");
+      s.setAttribute("aria-label", (i + 1) + " sur " + n);
+      if (b.image_url && /^https:\/\//.test(b.image_url)) {
+        s.classList.add("has-img");
+        var im = document.createElement("img");
+        im.src = b.image_url;
+        im.alt = "";
+        s.appendChild(im);
+      }
+      if (b.kind && KINDS[b.kind]) {
+        var k = document.createElement("div");
+        k.className = "kind";
+        k.textContent = KINDS[b.kind];
+        s.appendChild(k);
+      }
+      var h = document.createElement("h2");
+      h.textContent = b.title;
+      s.appendChild(h);
+      if (b.description) {
+        var p = document.createElement("p");
+        p.textContent = b.description;
+        s.appendChild(p);
+      }
+      if (b.button_label && b.button_url && SAFE_URL.test(b.button_url)) {
+        var a = document.createElement("a");
+        a.className = "btn";
+        a.href = b.button_url;
+        a.textContent = b.button_label;
+        s.appendChild(a);
+      }
+      track.appendChild(s);
+    });
+
+    if (n < 2) return;
+
+    var idx = 0, timer = null;
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var dots = [];
+    for (var i = 0; i < n; i++) {
+      (function (i) {
+        var d = document.createElement("button");
+        d.type = "button";
+        d.setAttribute("aria-label", "Aller à la bannière " + (i + 1));
+        d.innerHTML = '<span class="dot"></span>';
+        d.addEventListener("click", function () { go(i); });
+        dotsBox.appendChild(d);
+        dots.push(d);
+      })(i);
+    }
+    function mark() {
+      dots.forEach(function (d, k) { d.setAttribute("aria-current", k === idx ? "true" : "false"); });
+    }
+    function go(i, instant) {
+      idx = (i + n) % n;
+      track.scrollTo({ left: idx * track.clientWidth, behavior: instant ? "auto" : "smooth" });
+      mark();
+    }
+    function stop() { clearInterval(timer); timer = null; }
+    function start() {
+      if (reduce || timer) return;
+      timer = setInterval(function () { go(idx + 1); }, 5000);
+    }
+
+    prev.hidden = false;
+    next.hidden = false;
+    prev.addEventListener("click", function () { go(idx - 1); });
+    next.addEventListener("click", function () { go(idx + 1); });
+    track.addEventListener("scroll", function () {
+      var i = Math.round(track.scrollLeft / track.clientWidth);
+      if (i !== idx && i >= 0 && i < n) { idx = i; mark(); }
+    }, { passive: true });
+    window.addEventListener("resize", function () { go(idx, true); });
+
+    ["pointerdown", "mouseenter", "focusin"].forEach(function (ev) { carousel.addEventListener(ev, stop); });
+    ["mouseleave", "focusout"].forEach(function (ev) { carousel.addEventListener(ev, start); });
+    carousel.addEventListener("touchend", function () { stop(); setTimeout(start, 5000); });
+    document.addEventListener("visibilitychange", function () { if (document.hidden) stop(); else start(); });
+
+    mark();
+    start();
+  }
+
+  window.MB_SESSION.then(loadBanners);
 })();
 </script>
 </body>
