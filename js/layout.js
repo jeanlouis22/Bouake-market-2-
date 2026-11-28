@@ -4,25 +4,16 @@
     ["Accueil", "index.html", "accueil"],
     ["Marketplace"], ["Publicités"], ["Offres d'emploi"], ["Résidences"], ["Hôtels"]
   ];
-  var EXTRA = [["À propos"], ["Contact"]];
-
-  /* Réseaux sociaux : renseignez les adresses ici pour les afficher.
-     Les liens vides restent masqués. Plus tard, l'administration les gérera. */
-  var SOCIAL = [
-    ["Facebook", ""],
-    ["TikTok", ""],
-    ["Instagram", ""],
-    ["WhatsApp", ""]
-  ];
+  var EXTRA = [["À propos", "a-propos.html", "apropos"], ["Contact", "contact.html", "contact"]];
 
   var COLS = [
-    ["Découvrir", ["Accueil|index.html", "Marketplace", "Boutiques", "Publicités", "Promotions", "Événements à venir", "Offres d'emploi", "Résidences", "Hôtels", "À propos"]],
+    ["Découvrir", ["Accueil|index.html", "Marketplace", "Boutiques", "Publicités", "Promotions", "Événements à venir", "Offres d'emploi", "Résidences", "Hôtels", "À propos|a-propos.html"]],
     ["Espace acheteur", ["Comment acheter ?", "Devenir acheteur|auth.html", "Livraison et paiement", "Suivre mes commandes"]],
     ["Espace vendeur", ["Devenir vendeur", "Comment vendre ?", "Guide du vendeur", "Ma boutique", "Frais de livraison", "Règles de publication des produits"]],
     ["Espace professionnel", ["Devenir professionnel", "Espace professionnel", "Publier une résidence ou une maison à louer", "Guide des professionnels", "Gérer les demandes de réservation"]],
     ["Emploi et stages", ["Consulter les offres", "Comment postuler ?", "Comment publier une offre ?", "Conditions de publication", "Espace candidat"]],
     ["Publicités", ["Découvrir les publicités", "Demander une publicité", "Guide publicitaire", "Tarifs publicitaires", "Formats et conditions"]],
-    ["Aide et contact", ["Centre d'aide", "Nous contacter", "Signaler un problème", "Questions fréquentes", "Conseils de sécurité"]],
+    ["Aide et contact", ["Centre d'aide", "Nous contacter|contact.html", "Signaler un problème", "Questions fréquentes", "Conseils de sécurité"]],
     ["Informations légales", ["Conditions générales d'utilisation", "Politique de confidentialité", "Politique relative aux cookies", "Mentions légales", "Règles de publication"]]
   ];
 
@@ -35,9 +26,10 @@
   }
 
   var nav = NAV.map(function (n) { return link(n[0], n[1], n[2]); }).join("");
-  var extra = EXTRA.map(function (n) { return link(n[0]); }).join("");
+  var extra = EXTRA.map(function (n) { return link(n[0], n[1], n[2]); }).join("");
   var extraMobile = EXTRA.map(function (n) {
-    return '<a class="only-mobile" href="#" data-soon="' + n[0] + '">' + n[0] + "</a>";
+    var cur = n[2] === page ? ' aria-current="page"' : "";
+    return '<a class="only-mobile" href="' + n[1] + '"' + cur + ">" + n[0] + "</a>";
   }).join("");
 
   var ICON_MENU = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
@@ -76,17 +68,13 @@
     return '<details class="f-col"><summary>' + c[0] + "</summary><ul>" + items + "</ul></details>";
   }).join("");
 
-  var social = SOCIAL.filter(function (s) { return s[1]; }).map(function (s) {
-    return '<a href="' + s[1] + '" target="_blank" rel="noopener noreferrer">' + s[0] + "</a>";
-  }).join("");
-
   var footerHTML =
     '<footer class="site-footer"><div class="container">' +
       '<div class="f-brand">' +
         '<img src="assets/logo/logo-sombre.svg" alt="Market Bouaké">' +
         "<p>Marketplace locale de Bouaké.</p>" +
         "<p>Achetez, vendez, trouvez un logement ou une offre d'emploi près de chez vous.</p>" +
-        (social ? '<div class="f-social">' + social + "</div>" : "") +
+        '<div class="f-social" id="fsocial" hidden></div>' +
       "</div>" +
       '<div class="f-cols">' + cols + "</div>" +
       '<div class="f-bottom">© ' + new Date().getFullYear() + " Market Bouaké — Tous droits réservés.</div>" +
@@ -174,8 +162,8 @@
       sheetCard.appendChild(sheetLink("Connexion", "auth.html"));
       sheetCard.appendChild(sheetLink("Inscription", "auth.html"));
     }
-    sheetCard.appendChild(sheetLink("À propos", "#", true));
-    sheetCard.appendChild(sheetLink("Contact", "#", true));
+    sheetCard.appendChild(sheetLink("À propos", "a-propos.html"));
+    sheetCard.appendChild(sheetLink("Contact", "contact.html"));
   }
   renderSheet(null);
 
@@ -201,6 +189,64 @@
   }
   syncFooter();
   window.addEventListener("resize", syncFooter);
+
+  /* Utilitaires : ne produisent un lien que si la valeur est valide. */
+  var UTIL = {
+    wa: function (v) {
+      var d = String(v || "").replace(/[^\d]/g, "");
+      return d.length >= 8 && d.length <= 15 ? "https://wa.me/" + d : null;
+    },
+    mail: function (v) {
+      v = String(v || "").trim();
+      return /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(v) ? "mailto:" + v : null;
+    },
+    tel: function (v) {
+      var t = String(v || "").replace(/[^\d+]/g, "");
+      return /^\+?\d{8,15}$/.test(t) ? "tel:" + t : null;
+    },
+    url: function (v) {
+      v = String(v || "").trim();
+      return /^https:\/\/[^\s<>"]+$/.test(v) ? v : null;
+    }
+  };
+  window.MB_UTIL = UTIL;
+
+  /* Réglages publics du site (coordonnées, réseaux sociaux), gérés par l'administration. */
+  window.MB_SETTINGS = (async function () {
+    try {
+      var r = await sb.from("site_settings").select("key,value");
+      if (r.error) throw r.error;
+      var m = {};
+      (r.data || []).forEach(function (x) {
+        if (x.value && String(x.value).trim()) m[x.key] = String(x.value).trim();
+      });
+      return m;
+    } catch (e) {
+      console.error(e);
+      return {};
+    }
+  })();
+
+  window.MB_SETTINGS.then(function (S) {
+    var box = document.getElementById("fsocial");
+    if (!box) return;
+    var items = [
+      ["Facebook", UTIL.url(S.social_facebook)],
+      ["TikTok", UTIL.url(S.social_tiktok)],
+      ["Instagram", UTIL.url(S.social_instagram)],
+      ["WhatsApp", UTIL.wa(S.social_whatsapp)]
+    ].filter(function (i) { return i[1]; });
+    if (!items.length) return;
+    items.forEach(function (i) {
+      var a = document.createElement("a");
+      a.href = i[1];
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.textContent = i[0];
+      box.appendChild(a);
+    });
+    box.hidden = false;
+  });
 
   /* Session de l'utilisateur, partagée avec les pages. */
   window.MB_SESSION = (async function () {
