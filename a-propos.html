@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#C1272D">
+  <title>À propos – Market Bouaké</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo/favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/pages.css">
+</head>
+<body data-page="apropos">
+
+<div id="site-header"></div>
+
+<main class="page">
+  <h1>À propos de MARKET BOUAKÉ</h1>
+  <p class="lead">MARKET BOUAKÉ est la plateforme numérique locale des habitants, commerçants, entreprises et professionnels de Bouaké, en Côte d'Ivoire. Elle réunit au même endroit l'achat et la vente de produits, les publicités et événements, les offres d'emploi et de stage, ainsi que les résidences et les hôtels.</p>
+
+  <h2>Notre mission</h2>
+  <p>Rapprocher les habitants de Bouaké et ceux qui y travaillent : offrir un espace simple pour les visiteurs et fiable pour celles et ceux qui publient.</p>
+
+  <h2>Comment ça marche</h2>
+  <ul>
+    <li><strong>Sans compte</strong>, vous pouvez parcourir le site, rechercher, remplir votre panier et consulter les publicités, les offres d'emploi, les résidences et les hôtels.</li>
+    <li><strong>Un compte est demandé</strong> au moment de commander, de discuter avec un vendeur ou d'enregistrer des favoris.</li>
+    <li><strong>Un seul compte</strong> (même e-mail, même numéro) donne accès à l'espace acheteur. Vous pouvez ensuite activer un espace vendeur et un espace professionnel, et les gérer séparément.</li>
+  </ul>
+
+  <h2>Les avantages pour chacun</h2>
+  <div class="cards">
+    <div class="pcard">
+      <h3>Acheteurs</h3>
+      <ul>
+        <li>Découvrir les produits et les boutiques de Bouaké</li>
+        <li>Ajouter aux favoris et au panier</li>
+        <li>Suivre ses commandes</li>
+        <li>Discuter avec les vendeurs</li>
+        <li>Recevoir des notifications</li>
+      </ul>
+    </div>
+    <div class="pcard">
+      <h3>Vendeurs</h3>
+      <ul>
+        <li>Ouvrir sa boutique en ligne</li>
+        <li>Publier des produits avec photos</li>
+        <li>Gérer prix, stocks et commandes</li>
+        <li>Fixer ses frais de livraison par quartier</li>
+        <li>Discuter avec les acheteurs</li>
+      </ul>
+    </div>
+    <div class="pcard">
+      <h3>Professionnels de l'hébergement</h3>
+      <ul>
+        <li>Présenter résidences, maisons à louer, hôtels et auberges</li>
+        <li>Publier photos, tarifs et disponibilités</li>
+        <li>Recevoir des demandes de réservation</li>
+      </ul>
+    </div>
+  </div>
+  <p style="margin-top:10px">Une demande de réservation n'est pas une réservation confirmée : le responsable de l'établissement doit la valider.</p>
+
+  <h2>Les publicités</h2>
+  <p>La rubrique Publicités regroupe les publicités commerciales, les promotions, les événements, les concerts, les conférences, les cérémonies, les formations, les ouvertures d'établissements, les activités culturelles et les annonces générales. Elles sont publiées et gérées par l'administration de MARKET BOUAKÉ.</p>
+
+  <h2>Les offres d'emploi et de stage</h2>
+  <p>Chacun peut consulter les offres sans créer de compte : emplois, stages académiques et professionnels, formations et autres opportunités. Les candidatures se font directement auprès du recruteur, par WhatsApp ou par e-mail.</p>
+
+  <div class="callout">
+    <h2>Recruteurs, entreprises, annonceurs</h2>
+    <p>Les offres d'emploi et les publicités ne se publient pas depuis un compte : contactez directement l'administration.</p>
+    <ol>
+      <li>Vous contactez l'administration de MARKET BOUAKÉ.</li>
+      <li>Vous transmettez les informations de votre offre ou de votre publicité.</li>
+      <li>L'administration vérifie les informations.</li>
+      <li>Elle accepte ou refuse la publication. Si elle l'accepte, l'annonce est publiée sur le site.</li>
+    </ol>
+    <p><strong>Pour une offre d'emploi ou de stage, indiquez :</strong> le titre, le type d'offre, le nom de l'entreprise ou du recruteur, la description, les missions, le profil recherché, les conditions, la localisation, la date limite, votre adresse e-mail, votre numéro WhatsApp et les modalités de candidature.</p>
+    <p><strong>Pour une publicité, indiquez :</strong> le titre, l'image ou l'affiche, la description, la catégorie, les dates de début et de fin, le lieu, un contact et, si besoin, un lien externe.</p>
+    <div class="actions" id="actions">
+      <a class="btn" href="contact.html">Contacter l'administration</a>
+    </div>
+  </div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/layout.js"></script>
+<script>
+window.MB_SETTINGS.then(function (S) {
+  var wa = window.MB_UTIL.wa(S.contact_whatsapp);
+  if (!wa) return;
+  var a = document.createElement("a");
+  a.className = "btn sec";
+  a.href = wa;
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  a.textContent = "Écrire sur WhatsApp";
+  document.getElementById("actions").appendChild(a);
+});
+</script>
+</body>
+</html>
